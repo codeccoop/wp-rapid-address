@@ -55,17 +55,23 @@ document.addEventListener("DOMContentLoaded", function () {
 			});
 		});
 
+		let debounce;
 		input.addEventListener("input", (ev) => {
 			ev.target.classList.remove("error");
-			if (
-				Array.from(list.children).length !=
-				Array.from(template.children).length
-			) {
-				const values = Array.from(template.children)
-					.filter((opt) => opt.value.indexOf(ev.target.value) >= 0)
-					.map((opt) => opt.value);
-				updateDataList(input.getAttribute("list"), values);
-			}
+			clearTimeout(debounce);
+			debounce = setTimeout(() => {
+				const templateValues = Array.from(template.content.children);
+				if (
+					Array.from(list.children).length !== templateValues.length
+				) {
+					templateValues
+						.filter(
+							(opt) => opt.value.indexOf(ev.target.value) >= 0
+						)
+						.map((opt) => opt.value);
+					updateDataList(input.getAttribute("list"), values);
+				}
+			}, 200);
 		});
 	}
 
@@ -76,6 +82,12 @@ document.addEventListener("DOMContentLoaded", function () {
 			query[key] = Boolean(inputs[key]);
 			return query;
 		}, {});
+		const hasAddress = Object.keys(query).reduce(
+			(has, key) => has || query[key],
+			false
+		);
+		if (!hasAddress) return;
+
 		query.action = "address_datalists";
 		query._ajax_nonce = ajaxWPRA.nonce;
 
@@ -91,16 +103,14 @@ document.addEventListener("DOMContentLoaded", function () {
 			.then((data) => {
 				Object.keys(data).forEach((field) => {
 					const input = form.querySelector(`[data-field="${field}"`);
-					const options = updateDataList(
+					const [list] = updateDataList(
 						input.getAttribute("list"),
 						data[field]
 					);
 					const template = document.getElementById(
-						options[0].parentElement.getAttribute("data-template")
+						list.getAttribute("data-template")
 					);
-					options.forEach((option) => {
-						template.appendChild(option.cloneNode());
-					});
+					template.innerHTML = list.innerHTML;
 				});
 			});
 	}
@@ -131,12 +141,6 @@ document.addEventListener("DOMContentLoaded", function () {
 			},
 			body: encodeQuery(query),
 		}).then((res) => res.json());
-		// .then((data) => {
-		// 	Object.keys(inputs).forEach((field) => {
-		// 		inputs[field]?.classList.remove("dirty");
-		// 	});
-		// 	return data;
-		// });
 	}
 
 	function dirtyForm(form, currentField) {
@@ -159,10 +163,11 @@ document.addEventListener("DOMContentLoaded", function () {
 		const inputs = getInputs(form);
 
 		const autocompleteField = (input, field) => {
-			const values = updateDataList(
+			const [, options] = updateDataList(
 				input.getAttribute("list"),
 				data.map((d) => d[field])
-			).map((opt) => opt.value);
+			);
+			const values = options.map((opt) => opt.value);
 			if (values.length === 1) {
 				input.value = values[0];
 			} else if (values.indexOf(input.value) >= 0) {
@@ -189,14 +194,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	function updateDataList(id, values) {
 		const list = document.getElementById(id);
-		list.innerHTML = "";
+		let html = "";
 		new Set(values).forEach((value) => {
-			const option = document.createElement("option");
-			option.value = value;
-			option.textContent = value;
-			list.appendChild(option);
+			html += `<option value="${value}">${value}</option>`;
 		});
-		return Array.from(list.children);
+		list.innerHTML = html;
+		return [list, Array.from(list.children)];
 	}
 
 	function getInputs(form) {
