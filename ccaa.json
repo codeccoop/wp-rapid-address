@@ -1,0 +1,46 @@
+{
+  "Comunidad de Madrid": ["Madrid"],
+  "Cataluña": ["Barcelona", "Tarragona", "Girona", "Lleida"],
+  "Comunitat Valenciana": ["València", "Alacant", "Castelló"],
+  "Andalucía": [
+    "Sevilla",
+    "Málaga",
+    "Cádiz",
+    "Granada",
+    "Córdoba",
+    "Almería",
+    "Jaén",
+    "Huelva"
+  ],
+  "Región de Murcia": ["Murcia"],
+  "Illes Balears": ["Illes Balears"],
+  "Canarias": ["Las Palmas", "Santa Cruz de Tenerife"],
+  "País Vasco": ["Bizkaia", "Gipuzkoa", "Araba/Álava"],
+  "Galicia": ["A Coruña", "Pontevedra", "Lugo", "Ourense"],
+  "Asturias": ["Asturias"],
+  "Aragón": ["Zaragoza", "Huesca", "Teruel"],
+  "Castilla-La Mancha": [
+    "Toledo",
+    "Ciudad Real",
+    "Albacete",
+    "Guadalajara",
+    "Cuenca"
+  ],
+  "Extremadura": ["Badajoz", "Cáceres"],
+  "Navarra": ["Navarra"],
+  "Cantabria": ["Cantabria"],
+  "Castilla y León": [
+    "Valladolid",
+    "León",
+    "Burgos",
+    "Salamanca",
+    "Zamora",
+    "Ávila",
+    "Palencia",
+    "Segovia",
+    "Soria"
+  ],
+  "La Rioja": ["La Rioja"],
+  "Melilla": ["Melilla"],
+  "Ceuta": ["Ceuta"]
+}

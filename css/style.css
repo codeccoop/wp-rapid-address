@@ -1,0 +1,3 @@
+form.validated input.error {
+	border-color: red;
+}
