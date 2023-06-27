@@ -50,9 +50,8 @@ document.addEventListener("DOMContentLoaded", function () {
 				ev.target.classList.add("error");
 				return;
 			}
-			const state = wipeForm(form, field);
-			getSuggestions(form).then((data) => {
-				autocomplete(form, data, state);
+			getSuggestions(form, field).then((data) => {
+				autocomplete(form, data);
 			});
 		});
 
@@ -106,10 +105,15 @@ document.addEventListener("DOMContentLoaded", function () {
 			});
 	}
 
-	function getSuggestions(form) {
+	function getSuggestions(form, field) {
+		dirtyForm(form, field);
 		const inputs = getInputs(form);
 		const query = Object.keys(inputs).reduce((query, key) => {
-			if (inputs[key] && inputs[key].value) {
+			if (
+				inputs[key] &&
+				!inputs[key].classList.contains("dirty") &&
+				inputs[key].value
+			) {
 				query[key] = inputs[key].value;
 			}
 			return query;
@@ -127,49 +131,58 @@ document.addEventListener("DOMContentLoaded", function () {
 			},
 			body: encodeQuery(query),
 		}).then((res) => res.json());
+		// .then((data) => {
+		// 	Object.keys(inputs).forEach((field) => {
+		// 		inputs[field]?.classList.remove("dirty");
+		// 	});
+		// 	return data;
+		// });
 	}
 
-	function wipeForm(form, field) {
-		const targetBranch = hierarchy.filter((level) => level !== field);
+	function dirtyForm(form, currentField) {
+		const targetBranch = hierarchy.filter(
+			(level) => level !== currentField
+		);
 
 		return targetBranch.reduce((acum, field) => {
 			const input = form.querySelector(`[data-field="${field}"`);
-			if (input) {
+			if (input && field !== currentField) {
+				input.classList.add("dirty");
 				acum[field] = input.value;
-				input.value = "";
 			}
 
 			return acum;
 		}, {});
 	}
 
-	function autocomplete(form, data, state) {
+	function autocomplete(form, data) {
 		const inputs = getInputs(form);
 
-		if (inputs.zipcode) {
+		const autocompleteField = (input, field) => {
 			const values = updateDataList(
-				inputs.zipcode.getAttribute("list"),
-				data.map((d) => d.zipcode)
+				input.getAttribute("list"),
+				data.map((d) => d[field])
 			).map((opt) => opt.value);
 			if (values.length === 1) {
-				inputs.zipcode.value = values[0];
-			} else if (values.indexOf(state.zipcode) >= 0) {
-				inputs.zipcode.value = values[values.indexOf(state.zipcode)];
+				input.value = values[0];
+			} else if (values.indexOf(input.value) >= 0) {
+				input.value = values[values.indexOf(input.value)];
+			} else {
+				input.value = "";
 			}
+
+			input.classList.remove("dirty");
+			input.classList.remove("error");
+		};
+
+		if (inputs.zipcode) {
+			autocompleteField(inputs.zipcode, "zipcode");
 		}
 
 		for (let i = 1; i < 5; i++) {
 			const field = "level_" + i;
 			if (inputs[field]) {
-				const values = updateDataList(
-					inputs[field].getAttribute("list"),
-					data.map((d) => d[field])
-				).map((opt) => opt.value);
-				if (values.length === 1) {
-					inputs[field].value = values[0];
-				} else if (values.indexOf(state[field]) >= 0) {
-					inputs[field].value = values[values.indexOf(state[field])];
-				}
+				autocompleteField(inputs[field], field);
 			}
 		}
 	}
