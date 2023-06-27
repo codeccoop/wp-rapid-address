@@ -18,7 +18,7 @@ function wpra_enqueue_scripts()
 {
 	wp_enqueue_script(
 		'wp_rapid_address',
-		plugin_dir_url(__FILE__) . '/js/wpra.js',
+		plugin_dir_url(__FILE__) . 'js/wpra.js',
 		array(),
 		'0.1.0'
 	);
@@ -35,12 +35,13 @@ function wpra_enqueue_scripts()
 
 	wp_enqueue_style(
 		'wp_rapid_address',
-		plugin_dir_url(__FILE__) . '/css/style.css',
+		plugin_dir_url(__FILE__) . 'css/style.css',
 		'0.1.0'
 	);
 }
 
 add_action('wp_ajax_address_suggestions', 'wpra_suggestions_endpoint');
+add_action('wp_ajax_nopriv_address_suggestions', 'wpra_suggestions_endpoint');
 function wpra_suggestions_endpoint()
 {
 	check_ajax_referer('wp_rapid_address');
@@ -50,6 +51,7 @@ function wpra_suggestions_endpoint()
 }
 
 add_action('wp_ajax_address_datalists', 'wpra_datalists_endpoint');
+add_action('wp_ajax_nopriv_address_datalists', 'wpra_datalists_endpoint');
 function wpra_datalists_endpoint()
 {
 	check_ajax_referer('wp_rapid_address');
