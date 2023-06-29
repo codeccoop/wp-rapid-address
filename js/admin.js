@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	}
 
 	function submitGetForm(form) {
-		form.classList.remove("ajax-error");
+		form.classList.remove("error");
 		let exportName =
 			form.querySelector('input[type="text"]').value || "wpradb.json";
 
@@ -54,12 +54,12 @@ document.addEventListener("DOMContentLoaded", function () {
 				});
 			})
 			.catch((err) => {
-				form.classList.add("ajax-error");
+				form.classList.add("error");
 			});
 	}
 
 	function submitPostForm(form) {
-		form.classList.remove("ajax-error");
+		form.classList.remove("error");
 		const data = new FormData(form);
 		data.append("action", "wpra_post_db");
 		data.append("_ajax_nonce", ajaxWPRA.nonce);
@@ -76,7 +76,7 @@ document.addEventListener("DOMContentLoaded", function () {
 				if (!data.success) throw new Error(403);
 			})
 			.catch(() => {
-				form.classList.add("ajax-error");
+				form.classList.add("error");
 			});
 	}
 });

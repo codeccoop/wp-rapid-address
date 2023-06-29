@@ -1,0 +1,12 @@
+.wpra-admin-form .wpra-error {
+	display: none;
+	color: #ff6070;
+	border-left: 3px solid;
+	background-color: white;
+	padding: 0.45rem;
+	padding-left: 0.75rem;
+}
+
+.wpra-admin-form.error .wpra-error {
+	display: block;
+}

@@ -10,9 +10,6 @@ document.addEventListener("DOMContentLoaded", function () {
 	document.querySelectorAll("form").forEach(bindForm);
 
 	function bindForm(form, i) {
-		form.setAttribute("wpra-form", i);
-		form.addEventListener("submit", validateAddress);
-
 		bindInput(
 			form,
 			form.querySelector('[autocomplete="postal-code"]'),
@@ -28,6 +25,11 @@ document.addEventListener("DOMContentLoaded", function () {
 			);
 		}
 
+		if (form.querySelectorAll(".wpra-field").length) {
+			form.classList.add("wpra-form");
+			form.addEventListener("submit", validateAddress, true);
+		}
+
 		initializeSuggestions(form).catch(() => (boundError = true));
 	}
 
@@ -39,6 +41,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		input.insertAdjacentElement("afterend", list);
 		input.setAttribute("list", list.id);
 		input.setAttribute("data-field", field);
+		input.classList.add("wpra-field");
 
 		const template =
 			document.getElementById("wpra-template-" + field) ||
@@ -52,7 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 			const values = Array.from(list.children).map((opt) => opt.value);
 			if (strictMode && values.indexOf(ev.target.value) === -1) {
-				ev.target.classList.add("error");
+				ev.target.classList.add("wpra-error");
 				return;
 			}
 			getSuggestions(form, field).then((data) => {
@@ -62,13 +65,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
 		let debounce;
 		input.addEventListener("input", (ev) => {
-			ev.target.classList.remove("error");
+			ev.target.classList.remove("wpra-error");
 			clearTimeout(debounce);
 			debounce = setTimeout(() => {
+				const listValues = Array.from(list.children);
 				const templateValues = Array.from(template.content.children);
-				if (
-					Array.from(list.children).length !== templateValues.length
-				) {
+				if (listValues.length !== templateValues.length) {
 					const values = templateValues
 						.filter(
 							(opt) => opt.value.indexOf(ev.target.value) >= 0
@@ -126,7 +128,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		const query = Object.keys(inputs).reduce((query, key) => {
 			if (
 				inputs[key] &&
-				!inputs[key].classList.contains("dirty") &&
+				!inputs[key].classList.contains("wpra-dirty") &&
 				inputs[key].value
 			) {
 				query[key] = inputs[key].value;
@@ -156,7 +158,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		return targetBranch.reduce((acum, field) => {
 			const input = form.querySelector(`[data-field="${field}"`);
 			if (input && field !== currentField) {
-				input.classList.add("dirty");
+				input.classList.add("wpra-dirty");
 				acum[field] = input.value;
 			}
 
@@ -181,8 +183,8 @@ document.addEventListener("DOMContentLoaded", function () {
 				input.value = "";
 			}
 
-			input.classList.remove("dirty");
-			input.classList.remove("error");
+			input.classList.remove("wpra-dirty");
+			input.classList.remove("wpra-error");
 		};
 
 		if (inputs.zipcode) {
@@ -233,11 +235,11 @@ document.addEventListener("DOMContentLoaded", function () {
 			if (!input) return isValid;
 
 			if (input.value === "") {
-				input.classList.add("error");
+				input.classList.add("wpra-error");
 				return false;
 			}
 
-			if (input.classList.contains("error")) {
+			if (input.classList.contains("wpra-error")) {
 				return false;
 			}
 

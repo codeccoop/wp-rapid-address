@@ -61,11 +61,11 @@ function wpra_enqueue_admin_scripts()
 				'nonce' => wp_create_nonce('wpra_admin_ajax')
 			)
 		);
-	}
 
-	wp_enqueue_style(
-		'wpra',
-		plugin_dir_url(__FILE__) . 'css/style.css',
-		'0.1.0'
-	);
+		wp_enqueue_style(
+			'wpra-admin',
+			plugin_dir_url(__FILE__) . 'css/admin.css',
+			'0.1.0'
+		);
+	}
 }

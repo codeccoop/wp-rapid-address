@@ -1,16 +1,4 @@
-.wpra-form.validated input.error {
-	border-color: red;
-}
-
-.wpra-error {
-	display: none;
-	color: #ff6070;
-	border-left: 3px solid;
-	background-color: white;
-	padding: 0.45rem;
-	padding-left: 0.75rem;
-}
-
-.wpra-admin-form.ajax-error .wpra-error {
-	display: block;
+.wpra-form.validated input.wpra-error,
+.wpra-form.invalid input.wpra-error {
+	border-color: #ff6070;
 }
