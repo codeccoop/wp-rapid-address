@@ -54,8 +54,12 @@ document.addEventListener("DOMContentLoaded", function () {
 			if (boundError) return;
 
 			const values = Array.from(list.children).map((opt) => opt.value);
-			if (strictMode && values.indexOf(ev.target.value) === -1) {
-				ev.target.classList.add("wpra-error");
+			if (
+				strictMode &&
+				ev.target.value &&
+				values.indexOf(ev.target.value) === -1
+			) {
+				setTimeout(() => (ev.target.value = ""), 0);
 				return;
 			}
 			getSuggestions(form, field).then((data) => {
@@ -234,7 +238,7 @@ document.addEventListener("DOMContentLoaded", function () {
 			const input = inputs[key];
 			if (!input) return isValid;
 
-			if (input.value === "") {
+			if (input.value === "" && input.getAttribute("required")) {
 				input.classList.add("wpra-error");
 				return false;
 			}

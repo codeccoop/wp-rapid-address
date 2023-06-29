@@ -1,4 +1,4 @@
-.wpra-form.validated input.wpra-error,
-.wpra-form.invalid input.wpra-error {
+.wpra-form input.wpra-error,
+.wpra-form input.wpra-error {
 	border-color: #ff6070;
 }
