@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", function () {
 				if (
 					Array.from(list.children).length !== templateValues.length
 				) {
-					templateValues
+					const values = templateValues
 						.filter(
 							(opt) => opt.value.indexOf(ev.target.value) >= 0
 						)
