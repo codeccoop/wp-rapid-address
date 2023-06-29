@@ -13,12 +13,11 @@
  * @package         WP_Rapid_Address
  */
 
+require_once 'includes/ajax/suggestions.php';
+require_once 'includes/ajax/db.php';
 require_once 'includes/options-page.php';
-require_once 'includes/api-suggestions.php';
-require_once 'includes/api-db.php';
 
 add_action('wp_enqueue_scripts', 'wpra_enqueue_scripts');
-add_action('admin_enqueue_scripts', 'wpra_enqueue_scripts');
 function wpra_enqueue_scripts()
 {
 	wp_enqueue_script(
@@ -27,29 +26,42 @@ function wpra_enqueue_scripts()
 		array(),
 		'0.1.0'
 	);
+
 	wp_localize_script(
 		'wpra',
 		'ajaxWPRA',
 		array(
 			'endpoint' => admin_url('admin-ajax.php'),
-			'nonce' => wp_create_nonce('wpra_client_ajax')
+			'strictMode' => get_option('wpra_strict_mode') === 'on' ? 1 : 0,
 		)
 	);
 
-	wp_enqueue_script(
-		'wpra-admin',
-		plugin_dir_url(__FILE__) . 'js/admin.js',
-		array(),
+	wp_enqueue_style(
+		'wpra',
+		plugin_dir_url(__FILE__) . 'css/style.css',
 		'0.1.0'
 	);
-	wp_localize_script(
-		'wpra-admin',
-		'ajaxWPRA',
-		array(
-			'endpoint' => admin_url('admin-ajax.php'),
-			'nonce' => wp_create_nonce('wpra_admin_ajax')
-		)
-	);
+}
+
+add_action('admin_enqueue_scripts', 'wpra_enqueue_admin_scripts');
+function wpra_enqueue_admin_scripts()
+{
+	if (is_admin()) {
+		wp_enqueue_script(
+			'wpra-admin',
+			plugin_dir_url(__FILE__) . 'js/admin.js',
+			array(),
+			'0.1.0'
+		);
+		wp_localize_script(
+			'wpra-admin',
+			'ajaxWPRA',
+			array(
+				'endpoint' => admin_url('admin-ajax.php'),
+				'nonce' => wp_create_nonce('wpra_admin_ajax')
+			)
+		);
+	}
 
 	wp_enqueue_style(
 		'wpra',

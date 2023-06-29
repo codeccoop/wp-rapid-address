@@ -1,9 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
-	Array.from(document.getElementsByClassName("wpra-db-form")).forEach(
-		(form) => {
-			bindForm(form);
-		}
-	);
+	document.querySelectorAll(".wpra-admin-form").forEach((form) => {
+		bindForm(form);
+	});
 
 	function bindForm(form) {
 		form.addEventListener(
@@ -15,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
 				const method = form.getAttribute("method");
 				switch (method) {
 					case "get":
-						submitGetForm();
+						submitGetForm(form);
 						break;
 					case "post":
 						submitPostForm(form);
@@ -26,7 +24,15 @@ document.addEventListener("DOMContentLoaded", function () {
 		);
 	}
 
-	function submitGetForm() {
+	function submitGetForm(form) {
+		form.classList.remove("ajax-error");
+		let exportName =
+			form.querySelector('input[type="text"]').value || "wpradb.json";
+
+		if (!/\.json$/.test(exportName)) {
+			exportName += ".json";
+		}
+
 		fetch(ajaxWPRA.endpoint, {
 			method: "POST",
 			headers: {
@@ -40,7 +46,7 @@ document.addEventListener("DOMContentLoaded", function () {
 					const url = URL.createObjectURL(blob);
 					const anchor = document.createElement("a");
 					anchor.href = url;
-					anchor.download = "wpradb.json";
+					anchor.download = exportName;
 					document.body.appendChild(anchor);
 					anchor.click();
 					document.body.removeChild(anchor);
@@ -48,24 +54,15 @@ document.addEventListener("DOMContentLoaded", function () {
 				});
 			})
 			.catch((err) => {
-				console.log(err);
+				form.classList.add("ajax-error");
 			});
 	}
 
 	function submitPostForm(form) {
-		// debugger;
+		form.classList.remove("ajax-error");
 		const data = new FormData(form);
-		// data.append(
-		// 	"userfile",
-		// 	form.querySelector('input[type="file"]').files[0]
-		// );
 		data.append("action", "wpra_post_db");
 		data.append("_ajax_nonce", ajaxWPRA.nonce);
-
-		// const file = form.querySelector('input[type="file"]').files[0];
-		// file.text().then((json) => {
-		// 	const blob = new Blob([json], { type: "application/json" });
-		// 	data.append("blob", blob);
 
 		fetch(ajaxWPRA.endpoint, {
 			method: "POST",
@@ -78,9 +75,8 @@ document.addEventListener("DOMContentLoaded", function () {
 			.then((data) => {
 				if (!data.success) throw new Error(403);
 			})
-			.catch((err) => {
-				console.log(err);
+			.catch(() => {
+				form.classList.add("ajax-error");
 			});
-		// });
 	}
 });

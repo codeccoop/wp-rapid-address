@@ -1,4 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
+	let boundError = false;
+	const strictMode = Boolean(Number(ajaxWPRA.strictMode));
+
 	const hierarchy = Array.apply(null, Array(4))
 		.map((_, i) => "level_" + (i + 1))
 		.concat(["zipcode"])
@@ -25,7 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
 			);
 		}
 
-		initializeSuggestions(form);
+		initializeSuggestions(form).catch(() => (boundError = true));
 	}
 
 	function bindInput(form, input, field) {
@@ -45,8 +48,10 @@ document.addEventListener("DOMContentLoaded", function () {
 		document.body.appendChild(template);
 
 		input.addEventListener("change", (ev) => {
+			if (boundError) return;
+
 			const values = Array.from(list.children).map((opt) => opt.value);
-			if (values.indexOf(ev.target.value) === -1) {
+			if (strictMode && values.indexOf(ev.target.value) === -1) {
 				ev.target.classList.add("error");
 				return;
 			}
@@ -86,12 +91,12 @@ document.addEventListener("DOMContentLoaded", function () {
 			(has, key) => has || query[key],
 			false
 		);
-		if (!hasAddress) return;
+		if (!hasAddress) return Promise.resolve();
 
 		query.action = "address_datalists";
 		query._ajax_nonce = ajaxWPRA.nonce;
 
-		fetch(ajaxWPRA.endpoint, {
+		return fetch(ajaxWPRA.endpoint, {
 			method: "POST",
 			headers: {
 				"Content-Type":
@@ -172,7 +177,7 @@ document.addEventListener("DOMContentLoaded", function () {
 				input.value = values[0];
 			} else if (values.indexOf(input.value) >= 0) {
 				input.value = values[values.indexOf(input.value)];
-			} else {
+			} else if (strictMode) {
 				input.value = "";
 			}
 
@@ -220,6 +225,8 @@ document.addEventListener("DOMContentLoaded", function () {
 	}
 
 	function validateAddress(ev) {
+		if (!strictMode) return true;
+
 		const inputs = getInputs(ev.target);
 		const isValid = Object.keys(inputs).reduce((isValid, key) => {
 			const input = inputs[key];

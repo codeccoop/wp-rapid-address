@@ -4,7 +4,6 @@ add_action('wp_ajax_address_suggestions', 'wpra_suggestions_endpoint');
 add_action('wp_ajax_nopriv_address_suggestions', 'wpra_suggestions_endpoint');
 function wpra_suggestions_endpoint()
 {
-	check_ajax_referer('wpra');
 	$query = wpra_parse_query();
 	$data = wpra_find_entries($query);
 	wp_send_json($data);
@@ -14,7 +13,6 @@ add_action('wp_ajax_address_datalists', 'wpra_datalists_endpoint');
 add_action('wp_ajax_nopriv_address_datalists', 'wpra_datalists_endpoint');
 function wpra_datalists_endpoint()
 {
-	check_ajax_referer('wpra');
 	$query = wpra_parse_query();
 	$data = wpra_list_values($query);
 	wp_send_json($data);
@@ -38,7 +36,7 @@ function wpra_parse_query()
 
 function wpra_open_db()
 {
-	$db_path = plugin_dir_path(__FILE__) . '../database.json';
+	$db_path = plugin_dir_path(__FILE__) . '../../database.json';
 	$file = fopen($db_path, 'r');
 	$content = fread($file, filesize($db_path));
 	fclose($file);
